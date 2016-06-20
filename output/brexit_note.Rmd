@@ -21,20 +21,20 @@ The headline polls have shown "Brexit" steadily erode the "Remain" lead, particu
 
 But is this a trend or momentum?  How can we aggregate polls from different companies, using different methods and sample sizes, to make a coherent forecast for 23rd June?
 
-One way is to use Bayesian State Space model (see Simon Jackman http://jackman.stanford.edu/papers/).  The idea is that there is an underlying preference that is sampled by the published polls.  These polls differ not only in what they tell us about the underlying latent preference, but also in their quality (eg the sample size and the methodology). So the model is weighted to take greater account of the more reliable polls. The underlying preference evolves over time.
+One way is to use Bayesian State Space model (see Simon Jackman http://jackman.stanford.edu/papers/).  The idea is that there is an underlying, latent public opinion that is sampled by the published polls.  These polls differ not only in what they tell us about this underlying latent preference, but also in their quality (eg the sample size and the methodology). So the model is weighted to take greater account of the more reliable polls. The underlying preference evolves over time.
 
 More specifically
 
-- $\mu_{t} \sim N(\mu_{t-1},\sigma)$ The underlying preference to 'remain' is a normally distributed random walk, where sigma is estimated from the data.  The underlying preference is estimated for each day since 1st Jan 2014.
+- $\mu_{t} \sim N(\mu_{t-1},\sigma)$ The latent public opinion, expressed as the lead for remain, is a normally distributed random walk, where sigma is estimated from the data.  The underlying preference is estimated for each day since 1st Jan 2014.
 - $lead_{t,i} \sim N(\mu_{t} + pollster_{i}, \sigma_{lead, i,t})$ The model is measured against the polled lead for remain at time t for pollster i.  This approach can measure the bias for each pollster.
 
-The model is estimated using [stan](http://mc-stan.org/) and the code is available [here]().
+The model is estimated using [stan](http://mc-stan.org/) and the code is available [on github here](https://github.com/simeond/Brexit).
 
 The chart shows how the model can unpick the underlying lead, day by day, that is most consistent with the polls.  There is still a lot of daily volatility, reflecting how close the race is, how different the polls have been and that this is a model of the 'lead' (which is twice as volatile as the share of vote).
 
 ![Estimate of the underlying trend](../images/bayesian_ss.png)
 
-One  is that there are systematic 'biases' from each pollster's methodology to either 'Brexit' or 'Remain'. For example, IPSOS are biased toward 'Remain' and YouGov toward 'Brexit' This might be the sample method, re-weighting calculations etc.  This is one of the reasons it is hard just eyeball the raw poll averages.  A trend can appear just because of a sequence of pollsters.
+There are systematic 'biases' from each pollster's methodology to either 'Brexit' or 'Remain'. For example, IPSOS MORI are biased toward 'Remain' and YouGov toward 'Brexit' This might be the sample method, re-weighting calculations etc.  This is one of the reasons it is hard just eyeball the raw poll averages.  A trend can appear just because of a sequence of pollsters.
 
 ![Estimate of 'Pollster Bias'](../images/pollster_bias.png)
 
