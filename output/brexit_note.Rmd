@@ -1,4 +1,4 @@
-c("white")---
+---
 title: "Split Down the Middle?"
 subtitle: "Using the polls to forecast the likelihood of Brexit"
 date: "19 June 2016"
