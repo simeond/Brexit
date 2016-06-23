@@ -86,14 +86,14 @@ ggsave("images/raw_polls.png", width = 8, height = 5)
 # ---------------------------------------------------------------------------
 
 df <- brexit.df %>% 
-  filter(date <= dmy("13 June 2016")) %>% 
+  # filter(date <= dmy("13 June 2016")) %>% 
   mutate(pollster = as.factor(pollster))
 
 
 data_list <- list(n_polls = length(df$date),
                   n_span =  as.numeric(max(df$day)),
                   n_predict = as.numeric(dmy("23 June 2016")-min(df$date)+1),
-                  n_pred = as.numeric(dmy("23 June 2016")-min(df$date))-as.numeric(max(df$day))+1,
+                  n_pred = as.numeric(dmy("23 June 2016")-max(df$date)),
                   n_houses = length(unique(as.numeric(df$pollster))),
                   y = df$lead_share,
                   sampleSize = df$sample,
@@ -137,7 +137,7 @@ voting_intention %>%
   ggtitle("REMAIN LEAD - Bayesian State Space Model") +
   theme (text = element_text(size = 13),
          plot.title=element_text(face="bold", size=, vjust=1.25,hjust = 0))
-ggsave("images/bayesian_ss.png", width = 8, height = 5)
+# ggsave("images/bayesian_ss.png", width = 8, height = 5)
 
 
 # --- Plot predict vote
@@ -169,7 +169,7 @@ voting_intention %>%
   theme (text = element_text(size = 13),
          legend.position = "none",
          plot.title=element_text(face="bold", size=, vjust=1.25,hjust = 0))
-ggsave("images/bayesian_prediction.png", width = 8, height = 5)
+# ggsave("images/bayesian_prediction.png", width = 8, height = 5)
 
 
 # --- brexit prediction
@@ -180,7 +180,7 @@ data_frame(lead_predict = post$vote_predict[ ,data_list$n_pred]) %>%
   ggtitle("BREXIT - Remain Lead on 23 June") +
   theme (text = element_text(size = 13),
          plot.title=element_text(face="bold", size=, vjust=1.25,hjust = 0))
-ggsave("images/remain_probability.png", width = 8, height = 5)
+# ggsave("images/remain_probability.png", width = 8, height = 5)
 
 election <- mean(post$vote_predict[ ,data_list$n_pred]>0)
 
@@ -204,7 +204,7 @@ house_effect %>%
   ggtitle("Pollster 'bias'") +
   theme (text = element_text(size = 13),
          plot.title=element_text(face="bold", size=, vjust=1.25,hjust = 0))
-ggsave("images/pollster_bias.png", width = 8, height = 5)
+# ggsave("images/pollster_bias.png", width = 8, height = 5)
                 
 
 # # bayesian model
