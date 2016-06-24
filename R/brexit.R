@@ -35,14 +35,17 @@ dir <- "data/"
 # scrape the data
 ft_data <- read_html("https://ig.ft.com/sites/brexit-polling/") %>% 
   html_table()
+result <- c(48.1,51.9,0,"June 23, 2016","election",33551983)
 
+names_num <- c("stay","leave","undecided","sample")
 brexit <- ft_data[[1]] %>% 
+  rbind(result) %>% 
   setNames(c("stay","leave","undecided","date","pollster","sample")) %>% 
   mutate(date = mdy(str_replace(date,",","")),
          sample = ifelse(sample=="-", 1000, 
-                         str_replace(sample,",","")),
-         sample = as.numeric(sample),
-         lead = stay-leave,
+                         str_replace(sample,",",""))) %>% 
+  mutate_each_(funs(as.numeric),names_num) %>% 
+  mutate(lead = stay-leave,
          y_in = round(stay*sample/100,0),
          y_out = round(leave*sample/100,0),
          y_dunno = round(undecided*sample/100,0),
@@ -50,7 +53,8 @@ brexit <- ft_data[[1]] %>%
          pollster = ifelse(pollster=="Yougov","YouGov",pollster),
          pollster = as.factor(pollster),
          day=date-min(date) + 1,
-         countdown = dmy("23-06-2016")-date)
+         countdown = dmy("23-06-2016")-date) %>% 
+  arrange(date)
 
 drop <- c("y_in","y_out","y_dunno")
 brexit.df <- brexit %>% 
@@ -92,8 +96,8 @@ df <- brexit.df %>%
 
 data_list <- list(n_polls = length(df$date),
                   n_span =  as.numeric(max(df$day)),
-                  n_predict = as.numeric(dmy("23 June 2016")-min(df$date)+1),
-                  n_pred = as.numeric(dmy("23 June 2016")-max(df$date)),
+                  n_predict = as.numeric(dmy("24 June 2016")-min(df$date)+1),
+                  n_pred = as.numeric(dmy("24 June 2016")-max(df$date)),
                   n_houses = length(unique(as.numeric(df$pollster))),
                   y = df$lead_share,
                   sampleSize = df$sample,
@@ -105,8 +109,7 @@ data_list <- list(n_polls = length(df$date),
 sm <- stan_model("R/brexit_trend.stan")
 brexit_mod <- sampling(sm, data=data_list,
                        iter=2000,chains=4,cores=2,
-                       verbose=TRUE,
-                       diagnostic_file="helpme.csv")
+                       verbose=TRUE)
 
 # --- model summaries
 # rethinking::precis(brexit_mod,depth=2)
@@ -144,7 +147,7 @@ voting_intention %>%
 quants <- c(0.005,  0.025,  0.10,  0.25,  0.50, 0.75,  0.90, 0.975,  0.995)
 brexit_predict <- plyr::adply(post$vote_predict,2,quantile,probs=quants) %>% 
   setNames(c("period",'l005', 'l025', 'l10', 'l25' ,'median', 'u75', 'u90', 'u975', 'u995')) %>%
-  mutate(date = seq(max(df$date)+1,dmy("23 June 2016"),by='1 day'))
+  mutate(date = seq(max(df$date)+1,dmy("24 June 2016"),by='1 day'))
 
 
 voting_intention %>%
